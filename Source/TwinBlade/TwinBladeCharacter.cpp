@@ -5,8 +5,7 @@
 #include "TBAttributeSet.h"
 #include "TBAbilitySystemComponent.h"
 
-ATwinBladeCharacter::ATwinBladeCharacter()
-{
+ATwinBladeCharacter::ATwinBladeCharacter() {
 	// AbilitySystem을 추가하고 Replicate합니다.
 	AbilitySystemComponent = CreateDefaultSubobject<UTBAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
@@ -18,10 +17,7 @@ ATwinBladeCharacter::ATwinBladeCharacter()
 	bAbilitiesInitialized = false;
 }
 
-
-
-void ATwinBladeCharacter::PossessedBy(AController* NewController)
-{
+void ATwinBladeCharacter::PossessedBy(AController* NewController) {
 	Super::PossessedBy(NewController);
 
 	if (AbilitySystemComponent) {
@@ -30,8 +26,7 @@ void ATwinBladeCharacter::PossessedBy(AController* NewController)
 	}
 }
 
-void ATwinBladeCharacter::OnRep_Controller()
-{
+void ATwinBladeCharacter::OnRep_Controller() {
 	Super::OnRep_Controller();
 
 	if (AbilitySystemComponent) {
@@ -39,15 +34,13 @@ void ATwinBladeCharacter::OnRep_Controller()
 	}
 }
 
-void ATwinBladeCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
+void ATwinBladeCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ATwinBladeCharacter, CharacterLevel);
 }
 
-bool ATwinBladeCharacter::ActivateAbilityByClass(TSubclassOf<UTBAbility> Ability, bool bAllowRemoteActivation)
-{
+bool ATwinBladeCharacter::ActivateAbilityByClass(TSubclassOf<UTBAbility> Ability, bool bAllowRemoteActivation) {
 	if (AbilitySystemComponent) {
 		return AbilitySystemComponent->TryActivateAbilityByClass(Ability, bAllowRemoteActivation);
 	}
@@ -55,32 +48,51 @@ bool ATwinBladeCharacter::ActivateAbilityByClass(TSubclassOf<UTBAbility> Ability
 	return false;
 }
 
-void ATwinBladeCharacter::GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityTags, TArray<UTBAbility*>& ActiveAbilities)
-{
+void ATwinBladeCharacter::GetActiveAbilitiesByTags(FGameplayTagContainer AbilityTags, TArray<UTBAbility*>& ActiveAbilities) {
 	if (AbilitySystemComponent) {
 		AbilitySystemComponent->GetActiveAbilitiesByTags(AbilityTags, ActiveAbilities);
 	}
 }
 
-UAbilitySystemComponent* ATwinBladeCharacter::GetAbilitySystemComponent() const
-{
+bool ATwinBladeCharacter::GetCoolTimeByTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration) {
+	if (AbilitySystemComponent && CooldownTags.Num() > 0) {
+		TimeRemaining = 0.0f;
+		CooldownDuration = 0.0f;
+
+		FGameplayEffectQuery const Query = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(CooldownTags);
+		TArray<TPair<float, float>> DurationAndTimeRemaining = AbilitySystemComponent->GetActiveEffectsTimeRemainingAndDuration(Query);
+		if (DurationAndTimeRemaining.Num() > 0) {
+			int32 BestIdx = 0;
+			float LongestTime = DurationAndTimeRemaining[0].Key;
+			for (int32 Idx = 1; Idx < DurationAndTimeRemaining.Num(); ++Idx) {
+				if (DurationAndTimeRemaining[Idx].Key > LongestTime) {
+					LongestTime = DurationAndTimeRemaining[Idx].Key;
+					BestIdx = Idx;
+				}
+			}
+
+			TimeRemaining = DurationAndTimeRemaining[BestIdx].Key;
+			CooldownDuration = DurationAndTimeRemaining[BestIdx].Value;
+
+			return true;
+		}
+	}
+	return false;
+}
+
+UAbilitySystemComponent* ATwinBladeCharacter::GetAbilitySystemComponent() const {
 	return AbilitySystemComponent;
 }
 
-float ATwinBladeCharacter::GetMaxHealth() const
-{
+float ATwinBladeCharacter::GetMaxHealth() const {
 	return AttributeSet->GetMaxHealth();
 }
 
-float ATwinBladeCharacter::GetHealth() const
-{
+float ATwinBladeCharacter::GetHealth() const {
 	return AttributeSet->GetHealth();
 }
 
-
-
-void ATwinBladeCharacter::InitializeAbilities()
-{
+void ATwinBladeCharacter::InitializeAbilities() {
 	// 반드시 AbilitySystem이 먼저 추가되어있어야 합니다.
 	check(AbilitySystemComponent);
 
@@ -110,13 +122,11 @@ void ATwinBladeCharacter::InitializeAbilities()
 	}
 }
 
-void ATwinBladeCharacter::HandleDamage(float DamageValue, const FHitResult& HitResult, const struct FGameplayTagContainer& DamageTags, ATwinBladeCharacter* CauserCharacter, AActor* CauserActor)
-{
+void ATwinBladeCharacter::HandleDamage(float DamageValue, const FHitResult& HitResult, const struct FGameplayTagContainer& DamageTags, ATwinBladeCharacter* CauserCharacter, AActor* CauserActor) {
 	OnDamaged(DamageValue, HitResult, DamageTags, CauserCharacter, CauserActor);
 }
 
-void ATwinBladeCharacter::HandleHealthChanged(float HealthValue, const struct FGameplayTagContainer& HealthTags)
-{
+void ATwinBladeCharacter::HandleHealthChanged(float HealthValue, const struct FGameplayTagContainer& HealthTags) {
 	if (bAbilitiesInitialized) {
 		OnHealthChanged(HealthValue);
 	}

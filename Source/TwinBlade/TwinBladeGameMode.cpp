@@ -4,8 +4,7 @@
 #include "TwinBladeCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
-ATwinBladeGameMode::ATwinBladeGameMode()
-{
+ATwinBladeGameMode::ATwinBladeGameMode() {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/PlayerCharacter/BP_PlayerCharacter"));
 	if (PlayerPawnBPClass.Class != NULL) {
 		DefaultPawnClass = PlayerPawnBPClass.Class;

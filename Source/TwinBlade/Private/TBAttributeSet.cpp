@@ -8,8 +8,7 @@
 #include "TBAbilitySystemComponent.h"
 
 UTBAttributeSet::UTBAttributeSet()
-	: MaxHealth(1.0f), Health(1.0f), AttackPower(0.0f), DefensePower(1.0f), Damage(0.0f) 
-{}
+	: MaxHealth(1.0f), Health(1.0f), AttackPower(0.0f), DefensePower(1.0f), Damage(0.0f) {}
 
 void UTBAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& EffectData) {
 	Super::PostGameplayEffectExecute(EffectData);

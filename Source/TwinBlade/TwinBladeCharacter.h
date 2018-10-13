@@ -13,8 +13,7 @@ class UTBAttributeSet;
 class UTBAbilitySystemComponent;
 
 UCLASS()
-class ATwinBladeCharacter : public ACharacter, public IAbilitySystemInterface
-{
+class ATwinBladeCharacter : public ACharacter, public IAbilitySystemInterface {
 	GENERATED_BODY()
 
 public:
@@ -30,12 +29,16 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/* */
-	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	UFUNCTION(BlueprintCallable)
 	bool ActivateAbilityByClass(TSubclassOf<UTBAbility> Ability, bool bAllowRemoteActivation = true);
 
 	/* */
-	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	void GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityTags, TArray<UTBAbility*>& ActiveAbilities);
+	UFUNCTION(BlueprintCallable)
+	void GetActiveAbilitiesByTags(FGameplayTagContainer AbilityTags, TArray<UTBAbility*>& ActiveAbilities);
+
+	/* */
+	UFUNCTION(BlueprintCallable)
+	bool GetCoolTimeByTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration);
 
 	/* */
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -47,8 +50,6 @@ public:
 	/* */
 	UFUNCTION(BlueprintCallable)
 	virtual float GetHealth() const;
-
-
 
 protected:
 	/* */
@@ -68,6 +69,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnHealthChanged(float HealthValue);
 
+protected:
 	/* */
 	UPROPERTY()
 	UTBAbilitySystemComponent* AbilitySystemComponent;
@@ -81,15 +83,15 @@ protected:
 	int32 bAbilitiesInitialized;
 
 	/* */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<TSubclassOf<UTBAbility>> GameplayAbilities;
 
 	/* */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
 
 	/* */
-	UPROPERTY(EditAnywhere, Replicated, Category = Abilities)
+	UPROPERTY(EditAnywhere, Replicated)
 	int32 CharacterLevel;
 
 	/* */

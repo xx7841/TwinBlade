@@ -7,8 +7,7 @@
 #include "TwinBladeGameMode.generated.h"
 
 UCLASS(minimalapi)
-class ATwinBladeGameMode : public AGameModeBase
-{
+class ATwinBladeGameMode : public AGameModeBase {
 	GENERATED_BODY()
 
 public:

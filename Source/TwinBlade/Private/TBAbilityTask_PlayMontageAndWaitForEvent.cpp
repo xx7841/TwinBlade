@@ -6,8 +6,7 @@
 #include "TBAbilitySystemComponent.h"
 
 UTBAbilityTask_PlayMontageAndWaitForEvent::UTBAbilityTask_PlayMontageAndWaitForEvent(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
-{
+	: Super(ObjectInitializer) {
 	Rate = 1.0f;
 	bIsStopMontageWhenAbilityEnds = true;
 }
